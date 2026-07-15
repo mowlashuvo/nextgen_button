@@ -2,52 +2,165 @@ import 'package:flutter/material.dart';
 import 'package:nextgen_button/nextgen_button.dart';
 
 void main() {
-  runApp(const NextGenButtonExampleApp());
+  runApp(const MyApp());
 }
 
-class NextGenButtonExampleApp extends StatelessWidget {
-  const NextGenButtonExampleApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'NextGenButton Example',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        useMaterial3: true,
+        colorSchemeSeed: Colors.blue,
       ),
-      home: const NextGenButtonExampleScreen(),
+      home: const NextGenButtonExample(),
     );
   }
 }
 
-class NextGenButtonExampleScreen extends StatelessWidget {
-  const NextGenButtonExampleScreen({super.key});
+class NextGenButtonExample extends StatefulWidget {
+  const NextGenButtonExample({
+    super.key,
+  });
 
-  void _handleButtonTap() {
-    // Define the action to be performed on button tap
-    print('NextGenButton tapped!');
+  @override
+  State<NextGenButtonExample> createState() => _NextGenButtonExampleState();
+}
+
+class _NextGenButtonExampleState extends State<NextGenButtonExample> {
+  bool isLoading = false;
+
+  Future<void> _submit() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    await Future.delayed(
+      const Duration(seconds: 2),
+    );
+
+    setState(() {
+      isLoading = false;
+    });
+
+    debugPrint(
+      "Button clicked",
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('NextGenButton Example'),
+        title: const Text(
+          "NextGen Button",
+        ),
       ),
-      body: Center(
-        child: NextGenButton(
-          onTap: _handleButtonTap,
-          titleText: const Text('Click Me'),
-          color: Colors.blue,
-          borderColor: Colors.blueAccent,
-          border: 2.0,
-          radius: 8.0,
-          height: 50.0,
-          width: 200.0,
-          elevation: 5.0,
-          rightIcon: const Icon(Icons.arrow_forward, color: Colors.white),
-          isLoading: false,
-          leftIcon: const Icon(Icons.touch_app, color: Colors.white),
+      body: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            /// Basic Button
+            NextGenButton(
+              title: "Continue",
+              height: 50,
+              width: double.infinity,
+              radius: 14,
+              color: Colors.blue,
+              leftIcon: const Icon(
+                Icons.arrow_forward,
+                color: Colors.white,
+              ),
+              onTap: () {
+                debugPrint(
+                  "Continue clicked",
+                );
+              },
+            ),
+
+            const SizedBox(
+              height: 20,
+            ),
+
+            /// Gradient Button
+            NextGenButton(
+              title: "Get Started",
+              height: 52,
+              width: double.infinity,
+              radius: 16,
+              gradient: const LinearGradient(
+                colors: [
+                  Colors.blue,
+                  Colors.purple,
+                ],
+              ),
+              leftIcon: const Icon(
+                Icons.rocket_launch,
+                color: Colors.white,
+              ),
+              rightIcon: const Icon(
+                Icons.arrow_forward_ios,
+                size: 18,
+                color: Colors.white,
+              ),
+              onTap: () {},
+            ),
+
+            const SizedBox(
+              height: 20,
+            ),
+
+            /// Loading Button
+            NextGenButton(
+              title: "Submit",
+              height: 52,
+              width: double.infinity,
+              radius: 16,
+              color: Colors.green,
+              isLoading: isLoading,
+              onTap: _submit,
+            ),
+
+            const SizedBox(
+              height: 20,
+            ),
+
+            /// Disabled Button
+            NextGenButton(
+              title: "Disabled",
+              height: 52,
+              width: double.infinity,
+              radius: 16,
+              color: Colors.grey,
+              enabled: false,
+              onTap: () {},
+            ),
+
+            const SizedBox(
+              height: 20,
+            ),
+
+            /// Backward compatible API
+            NextGenButton(
+              titleText: const Text(
+                "Old API Support",
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              height: 50,
+              width: double.infinity,
+              radius: 14,
+              color: Colors.black,
+              onTap: () {},
+            ),
+          ],
         ),
       ),
     );

@@ -1,133 +1,216 @@
 import 'package:flutter/material.dart';
 
-/// A customizable button widget for next-generation UI.
+/// A modern and highly customizable button widget.
 ///
-/// The `NextGenButton` widget allows you to create a button with customizable
-/// properties such as color, border, radius, and icons. It also includes an
-/// optional loading state.
-class NextGenButton extends StatefulWidget {
-  /// Creates a `NextGenButton`.
+/// Features:
+///
+/// * Text or custom widget title
+/// * Gradient background
+/// * Loading state
+/// * Left and right icons
+/// * Disabled state
+/// * Border customization
+/// * Material ripple effect
+/// * Material 3 compatible
+///
+/// Either [title] or [titleText] must be provided.
+///
+/// Example:
+///
+/// ```dart
+/// NextGenButton(
+///   title: 'Continue',
+///   height: 48,
+///   width: double.infinity,
+///   radius: 12,
+///   color: Colors.blue,
+///   onTap: () {},
+/// )
+/// ```
+class NextGenButton extends StatelessWidget {
+  /// Creates a [NextGenButton].
   ///
-  /// The [onTap], [titleText], [height], and [width] parameters are required.
-  /// The [color], [borderColor], [border], [radius], [elevation], [rightIcon],
-  /// [leftIcon], and [isLoading] parameters are optional and have default values.
+  /// Either [title] or [titleText] must be provided.
   const NextGenButton({
     super.key,
     required this.onTap,
-    required this.titleText,
+    required this.height,
+    required this.width,
+    this.title,
+    this.titleText,
+    this.textStyle,
     this.color = Colors.white,
-    this.borderColor = Colors.white,
+    this.gradient,
+    this.borderColor = Colors.transparent,
     this.border = 0,
     this.radius = 0,
     this.elevation = 0,
-    required this.height,
-    required this.width,
-    this.rightIcon = const SizedBox.shrink(),
+    this.leftIcon,
+    this.rightIcon,
+    this.iconSpacing = 8,
     this.isLoading = false,
-    this.leftIcon = const SizedBox.shrink(),
-  });
+    this.loadingWidget,
+    this.loadingColor,
+    this.enabled = true,
+    this.splashColor,
+  }) : assert(
+          title != null || titleText != null,
+          'Either title or titleText must be provided.',
+        );
 
-  /// The callback function that is triggered when the button is tapped.
-  ///
-  /// If [isLoading] is true, the button will be disabled and the [onTap] callback
-  /// will not be triggered.
+  /// Callback invoked when the button is tapped.
   final VoidCallback onTap;
 
-  /// The widget that will be displayed as the title text of the button.
+  /// Text displayed inside the button.
   ///
-  /// This could be a [Text] widget or any other widget that represents the button's title.
-  final Widget titleText;
+  /// Ignored when [titleText] is provided.
+  final String? title;
 
-  /// The widget to be displayed on the right side of the title text.
+  /// Custom widget displayed as the button title.
   ///
-  /// This could be an icon, an image, or any other widget. By default, it is an
-  /// empty widget ([SizedBox.shrink]).
-  final Widget rightIcon;
+  /// This property is kept for backward compatibility.
+  final Widget? titleText;
 
-  /// The widget to be displayed on the left side of the title text.
-  ///
-  /// This could be an icon, an image, or any other widget. By default, it is an
-  /// empty widget ([SizedBox.shrink]).
-  final Widget leftIcon;
+  /// Text style applied when using [title].
+  final TextStyle? textStyle;
 
-  /// The background color of the button.
-  ///
-  /// Defaults to [Colors.white].
-  final Color color;
-
-  /// The color of the button's border.
-  ///
-  /// Defaults to [Colors.white].
-  final Color borderColor;
-
-  /// The width of the button's border.
-  ///
-  /// Defaults to 0 (no border).
-  final double border;
-
-  /// The radius of the button's corners.
-  ///
-  /// Defaults to 0 (sharp corners).
-  final double radius;
-
-  /// The height of the button.
+  /// Height of the button.
   final double height;
 
-  /// The elevation of the button.
-  ///
-  /// Controls the shadow depth of the button. Defaults to 0 (no shadow).
-  final double elevation;
-
-  /// The width of the button.
+  /// Width of the button.
   final double width;
 
-  /// Indicates whether the button is in a loading state.
+  /// Solid background color.
   ///
-  /// If true, a [CircularProgressIndicator] will be displayed, and the button
-  /// will be disabled.
+  /// Ignored when [gradient] is provided.
+  final Color color;
+
+  /// Gradient background.
+  final Gradient? gradient;
+
+  /// Border color.
+  final Color borderColor;
+
+  /// Border width.
+  final double border;
+
+  /// Corner radius.
+  final double radius;
+
+  /// Material elevation.
+  final double elevation;
+
+  /// Widget displayed before the title.
+  final Widget? leftIcon;
+
+  /// Widget displayed after the title.
+  final Widget? rightIcon;
+
+  /// Space between icon and title.
+  final double iconSpacing;
+
+  /// Whether to display a loading indicator.
+  ///
+  /// When true, the button is automatically disabled.
   final bool isLoading;
 
-  @override
-  State<NextGenButton> createState() => _NextGenButtonState();
-}
+  /// Custom loading widget.
+  ///
+  /// If null, a [CircularProgressIndicator] is shown.
+  final Widget? loadingWidget;
 
-class _NextGenButtonState extends State<NextGenButton> {
+  /// Loading indicator color.
+  final Color? loadingColor;
+
+  /// Whether this button can be tapped.
+  final bool enabled;
+
+  /// Ripple splash color.
+  final Color? splashColor;
+
+  Widget _buildTitle(BuildContext context) {
+    if (titleText != null) {
+      return titleText!;
+    }
+
+    return Text(
+      title!,
+      overflow: TextOverflow.ellipsis,
+      maxLines: 1,
+      style: textStyle ??
+          Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+    );
+  }
+
+  Widget _buildLoading(BuildContext context) {
+    return loadingWidget ??
+        SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: loadingColor ?? Theme.of(context).colorScheme.onPrimary,
+          ),
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.zero,
-      elevation: widget.elevation,
-      color: widget.color,
-      shape: RoundedRectangleBorder(
-        side: BorderSide(color: widget.borderColor, width: widget.border),
-        borderRadius: BorderRadius.circular(widget.radius),
-      ),
-      child: InkWell(
-        onTap: widget.isLoading ? null : widget.onTap,
-        customBorder: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(widget.radius),
+    final borderRadius = BorderRadius.circular(radius);
+
+    return Material(
+      color: Colors.transparent,
+      elevation: elevation,
+      borderRadius: borderRadius,
+      child: Ink(
+        decoration: BoxDecoration(
+          color: gradient == null ? color : null,
+          gradient: gradient,
+          borderRadius: borderRadius,
+          border: Border.all(
+            color: borderColor,
+            width: border,
+          ),
         ),
-        child: SizedBox(
-          width: widget.width,
-          height: widget.height,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (widget.isLoading)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: CircularProgressIndicator(
-                    color: Theme.of(context).indicatorColor,
+        child: InkWell(
+          borderRadius: borderRadius,
+          splashColor: splashColor,
+          onTap: enabled && !isLoading ? onTap : null,
+          child: SizedBox(
+            height: height,
+            width: width,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  if (isLoading) ...[
+                    _buildLoading(context),
+                    SizedBox(width: iconSpacing),
+                  ],
+                  if (leftIcon != null) ...[
+                    leftIcon!,
+                    SizedBox(width: iconSpacing),
+                  ],
+                  Flexible(
+                    child: DefaultTextStyle.merge(
+                      overflow: TextOverflow.ellipsis,
+                      child: _buildTitle(context),
+                    ),
                   ),
-                ),
-              widget.leftIcon,
-              if (widget.leftIcon != SizedBox.shrink())
-                const SizedBox(width: 8),
-              widget.titleText,
-              if (widget.rightIcon != SizedBox.shrink())
-                const SizedBox(width: 8),
-              widget.rightIcon,
-            ],
+                  if (rightIcon != null) ...[
+                    SizedBox(width: iconSpacing),
+                    rightIcon!,
+                  ],
+                ],
+              ),
+            ),
           ),
         ),
       ),
